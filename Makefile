@@ -40,6 +40,10 @@ default: build
 build:
 	$(GO.build) -o $(TARGET) ./cmd/$(NAME)
 
+.PHONY: test
+test:
+	$(GO.test) ./...
+
 .PHONY: clean
 clean:
 	$(RM) $(TARGET)
