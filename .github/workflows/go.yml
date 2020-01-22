@@ -1,5 +1,7 @@
 name: Go
+
 on: [push]
+
 jobs:
   build:
     name: Build
@@ -8,7 +10,7 @@ jobs:
       - name: Set up Go 1.13
         uses: actions/setup-go@v1
         with:
-          go-version: '1.13'
+          go-version: "1.13"
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@master
@@ -20,5 +22,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
 
+      - name: Install
+        run: go get github.com/mitchellh/gox
+
       - name: Build
-        run: make
+        run: $(go env GOPATH)/bin/gox
+          -osarch='darwin/amd64 linux/amd64 linux/386 freebsd/amd64 freebsd/386'
+          -output=dist/{{.Dir}}_{{.OS}}_{{.Arch}}
+          -ldflags='-X main.version=0.0.0+${{ github.sha }}'
+          ./...
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: dist
+          path: dist

@@ -1,9 +1,11 @@
 GOOS		:= $(shell go env GOOS)
 GOARCH		:= $(shell go env GOARCH)
-TARGET		:= $(foreach n,$(wildcard cmd/*),$(addprefix bin/,$(notdir $n)))
+
+PROTO		:= $(wildcard pb/*.proto)
+GENERATED	:= $(PROTO:.proto=.pb.go)
+OUTPUT		:= bin
 
 ifeq ($(GOOS),windows)
-TARGET		:= $(foreach t,$(TARGET),$(addsuffix .exe,$t))
 LDFLAGS		:= $(LDFLAGS) -H=windowsgui
 EXTLDFLAGS	:= $(EXTLDFLAGS) -static
 endif
@@ -20,16 +22,21 @@ ifeq ($(GOOS),android)
 LDFLAGS		:= $(LDFLAGS) -s
 endif
 
-GO.build	:= GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=0 go build -tags '$(TAGS)' -ldflags '$(LDFLAGS) -extldflags "$(EXTLDFLAGS)"'
+GO.build	:= go build -tags '$(TAGS)' -ldflags '$(LDFLAGS) -extldflags "$(EXTLDFLAGS)"'
 
-.PHONY: all clean
+.PHONY: build proto clean
+.SUFFIXES: .pb.go .proto
 
-all: $(TARGET)
+build: $(OUTPUT) proto
+	GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=0 $(GO.build) -o $< ./...
+
+proto: $(GENERATED)
 
 clean:
-	$(RM) $(TARGET)
+	$(RM) $(wildcard $(OUTPUT)/*)
 
-bin/%: FORCE
-	$(GO.build) -o $@ ./cmd/$(notdir $(basename $@))
+$(OUTPUT):
+	mkdir -p $@
 
-FORCE:
+pb/%.pb.go: pb/%.proto
+	protoc -I pb/ $< --go_out=plugins=grpc:pb
