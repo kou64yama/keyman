@@ -20,6 +20,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
 
+      - name: Install tools
+        run: |
+          go get -u golang.org/x/lint/golint
+
+      - run: go vet ./...
+      - run: $(go env GOPATH)/bin/golint ./...
+
       - name: Test
         run: make test
 
