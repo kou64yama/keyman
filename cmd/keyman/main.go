@@ -1,7 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"keyman/internal/app"
+	"keyman/internal/cmd"
+	"os"
+)
 
 func main() {
-	panic(fmt.Errorf("not implemented"))
+	args := os.Args[1:]
+	code := app.Run(new(cmd.MainCommand), args...)
+	os.Exit(code)
 }
