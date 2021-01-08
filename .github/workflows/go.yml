@@ -24,8 +24,8 @@ jobs:
         run: |
           go get -u golang.org/x/lint/golint
 
-      - run: go vet ./...
-      - run: $(go env GOPATH)/bin/golint ./...
+      - name: Lint
+        run: make lint
 
       - name: Test
         run: make test
@@ -33,4 +33,4 @@ jobs:
       - uses: codecov/codecov-action@v1
 
       - name: Build
-        run: make all
+        run: make build
