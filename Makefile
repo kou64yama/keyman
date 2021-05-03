@@ -30,7 +30,7 @@ endif
 GO.vet		:= go vet
 GO.test		:= go test -race -covermode=atomic
 GO.build	:= GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=0 go build -tags '$(TAGS)' -ldflags '$(LDFLAGS) -extldflags "$(EXTLDFLAGS)"'
-GO.lint		:= $(GOPATH)/bin/golint
+GO.staticcheck	:= $(GOPATH)/bin/staticcheck
 
 .PHONY: all clean proto lint test build
 
@@ -43,7 +43,7 @@ proto: $(GENERATED)
 
 lint:
 	$(GO.vet) $(PACKAGES)
-	$(GO.lint) $(PACKAGES)
+	$(GO.staticcheck) $(PACKAGES)
 
 test:
 	$(GO.test) -coverprofile=coverage.txt $(PACKAGES)

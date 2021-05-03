@@ -5,10 +5,10 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Go 1.13
+      - name: Set up Go 1.16.3
         uses: actions/setup-go@v1
         with:
-          go-version: "1.13"
+          go-version: "1.16.3"
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@master
@@ -22,7 +22,7 @@ jobs:
 
       - name: Install tools
         run: |
-          go get -u golang.org/x/lint/golint
+          go install honnef.co/go/tools/cmd/staticcheck@latest
 
       - name: Lint
         run: make lint
